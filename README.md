@@ -12,7 +12,7 @@
 
 ## How to build ##
 
-* download [jsontools-1.0.0.tar.gz](https://github.com/AubinMahe/jsontools/jsontools-1.0.0.tar.gz)
+* download [jsontools-1.0.0.tar.gz](https://github.com/AubinMahe/jsontools/raw/master/jstools-1.0.0.tar.gz)
 * tar xzf jsontools-1.0.0.tar.gz
 * cd jsontools-1.0.0
 * ./configure
@@ -26,7 +26,7 @@ See [documentation](https://aubinmahe.github.io/jsontools/html/index.html)
 ## Sample code ##
 
 This sample code:
-* read the json file ["data/object.json"](https://github.com/AubinMahe/jsontools/data/object.json)
+* read the json file ["data/object.json"](https://raw.githubusercontent.com/AubinMahe/jsontools/master/data/object.json)
 * search an element in the loaded tree via the path `"repository.examples[2].subs[3].value"`
 * print the value found
 * serialize as text the tree and print it
