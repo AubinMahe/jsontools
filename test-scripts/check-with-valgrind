@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+GOOD="../data/boolean.json ../data/integer.json ../data/double.json ../data/string.json ../data/object.json ../data/array.json"
+BAD="../data/error1.json ce-fichier-n-existe-pas.json"
+LD_LIBRARY_PATH=.libs valgrind --error-exitcode=1 --leak-check=full --show-leak-kinds=all --track-origins=yes\
+ .libs/jstoolstests $GOOD ../data/pass* ../data/fail* $BAD ../data/object.json
+ 

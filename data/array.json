@@ -1,0 +1,26 @@
+[
+  {
+    "integer": 1,
+    "double" : 3.14,
+    "boolean": false,
+    "obj": {
+      "name": "Aubin"
+    }
+  },
+  {
+    "integer": 2,
+    "double" : 6.28,
+    "boolean": true,
+    "obj": {
+      "name": "Muriel"
+    }
+  },
+  {
+    "integer": 3,
+    "double" : 9.32,
+    "boolean": false,
+    "obj": {
+      "name": "Eve"
+    }
+  }
+]
