@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../json-xml.xsd">
+   <property name="subs">
+      <array>
+         <object>
+            <property name="value">
+               <integer value="1" />
+            </property>
+         </object>
+         <object>
+            <property name="value">
+               <integer value="2" />
+            </property>
+         </object>
+         <object>
+            <property name="value">
+               <integer value="3" />
+            </property>
+         </object>
+      </array>
+   </property>
+   <property name="name">
+      <string>jsmn</string>
+   </property>
+   <property name="keywords">
+      <string>json</string>
+   </property>
+   <property name="author">
+      <string>Aubin Mahé, © 2021 (UTF-8 test string)</string>
+   </property>
+   <property name="description">
+      <string>Minimalistic JSON parser/tokenizer in C. It can be easily integrated into resource-limited or embedded projects</string>
+   </property>
+   <property name="repository">
+      <object>
+         <property name="type">
+            <string>git</string>
+         </property>
+         <property name="url">
+            <string>https://github.com/zserge/jsmn.git</string>
+         </property>
+         <property name="examples">
+            <array>
+               <object>
+                  <property name="integer">
+                     <integer value="1" />
+                  </property>
+                  <property name="double">
+                     <double value="3.14" />
+                  </property>
+                  <property name="boolean">
+                     <boolean value="false" />
+                  </property>
+                  <property name="subs">
+                     <array>
+                        <object>
+                           <property name="value">
+                              <integer value="1" />
+                           </property>
+                        </object>
+                        <object>
+                           <property name="value">
+                              <integer value="2" />
+                           </property>
+                        </object>
+                        <object>
+                           <property name="value">
+                              <integer value="3" />
+                           </property>
+                        </object>
+                     </array>
+                  </property>
+                  <property name="values">
+                     <array>
+                        <integer value="9" />
+                        <integer value="8" />
+                        <integer value="7" />
+                     </array>
+                  </property>
+               </object>
+               <object>
+                  <property name="integer">
+                     <integer value="2" />
+                  </property>
+                  <property name="double">
+                     <double value="6.28" />
+                  </property>
+                  <property name="boolean">
+                     <boolean value="true" />
+                  </property>
+               </object>
+               <object>
+                  <property name="integer">
+                     <integer value="3" />
+                  </property>
+                  <property name="double">
+                     <double value="9.32" />
+                  </property>
+                  <property name="boolean">
+                     <boolean value="false" />
+                  </property>
+                  <property name="subs">
+                     <array>
+                        <object>
+                           <property name="value">
+                              <integer value="1" />
+                           </property>
+                        </object>
+                        <object>
+                           <property name="value">
+                              <integer value="4" />
+                           </property>
+                        </object>
+                        <object>
+                           <property name="value">
+                              <integer value="5" />
+                           </property>
+                        </object>
+                        <object>
+                           <property name="value">
+                              <integer value="6" />
+                           </property>
+                        </object>
+                        <object>
+                           <property name="value">
+                              <integer value="7" />
+                           </property>
+                        </object>
+                        <object>
+                           <property name="value">
+                              <integer value="8" />
+                           </property>
+                        </object>
+                     </array>
+                  </property>
+               </object>
+            </array>
+         </property>
+      </object>
+   </property>
+   <property name="frameworks">
+      <string>*</string>
+   </property>
+   <property name="platforms">
+      <string>*</string>
+   </property>
+   <property name="exclude">
+      <string>test</string>
+   </property>
+</object>

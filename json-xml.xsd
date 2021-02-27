@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="object"  type="objectType"  />
+  <xs:element name="array"   type="arrayType"   />
+  <xs:element name="boolean" type="booleanType" />
+  <xs:element name="integer" type="integerType" />
+  <xs:element name="double"  type="doubleType"  />
+  <xs:element name="string"  type="xs:string"   />
+  <xs:element name="null"    type="xs:string"   />
+
+  <xs:complexType name="propertyType">
+    <xs:choice>
+      <xs:element ref="object"  />
+      <xs:element ref="array"   />
+      <xs:element ref="boolean" />
+      <xs:element ref="integer" />
+      <xs:element ref="double"  />
+      <xs:element ref="string"  />
+      <xs:element ref="null"    />
+    </xs:choice>
+    <xs:attribute type="xs:string" name="name"/>
+  </xs:complexType>
+
+  <xs:complexType name="objectType">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="property" type="propertyType" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="arrayType">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:choice>
+        <xs:element ref="object"  />
+        <xs:element ref="array"   />
+        <xs:element ref="boolean" />
+        <xs:element ref="integer" />
+        <xs:element ref="double"  />
+        <xs:element ref="string"  />
+        <xs:element ref="null"    />
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="booleanType">
+    <xs:attribute name="value" type="xs:boolean" />
+  </xs:complexType>
+  
+  <xs:complexType name="integerType">
+    <xs:attribute name="value" type="xs:long" />
+  </xs:complexType>
+  
+  <xs:complexType name="doubleType">
+    <xs:attribute name="value" type="xs:float" />
+  </xs:complexType>
+  
+  <xs:complexType name="stringType" />
+  
+  <xs:complexType name="nullType" />
+  
+</xs:schema>

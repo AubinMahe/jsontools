@@ -2,6 +2,7 @@
   "subs":[{"value":1},{"value":2},{"value":3}],
   "name": "jsmn",
   "keywords": "json",
+  "author": "Aubin Mahé, © 2021 (UTF-8 test string)",
   "description": "Minimalistic JSON parser/tokenizer in C. It can be easily integrated into resource-limited or embedded projects",
   "repository":
   {

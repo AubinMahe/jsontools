@@ -10,6 +10,7 @@ libjstools_la_SOURCES =\
  src/JST_list.c\
  src/JST_load.c\
  src/JST_pairs_compare.c\
+ src/JST_save_xml.c\
  src/JST_save.c\
  src/JST_serialize.c\
  src/JST_string.c\

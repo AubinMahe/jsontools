@@ -197,6 +197,21 @@ static bool test_serialize_compact( const char * ref, JST_Element * root ) {
    return system( cmp_command ) == EXIT_SUCCESS;
 }
 
+static bool test_save_xml( const char * json_filename, JST_Element * root ) {
+   char * xml_filename = strdup( json_filename );
+   if( strtok( xml_filename, "." ) == NULL ) {
+      free( xml_filename );
+      return false;
+   }
+   strcat( xml_filename, ".xml" );
+   char cmp_command[240];
+   snprintf( cmp_command, sizeof( cmp_command ), "cmp %s /tmp/object.xml", xml_filename );
+   bool ok = ( JST_save_to_xml_file( "/tmp/object.xml", root, 3 ) == JST_ERR_NONE )
+      &&     ( system( cmp_command ) == EXIT_SUCCESS );
+   free( xml_filename );
+   return ok;
+}
+
 static const char * get_error_string( JST_Error err ) {
    switch( err ) {
    case JST_ERR_ERRNO                         : return strerror( errno );
@@ -238,7 +253,8 @@ int main( int argc, char * argv[] ) {
                   && test_add_item       ( &root )
                   && test_replace_item   ( &root )
                   && test_remove_item    ( &root )
-                  && test_remove_property( &root ))
+                  && test_remove_property( &root )
+                  && test_save_xml       ( json_filename, &root ))
                {
                   retVal = EXIT_SUCCESS;
                }

@@ -68,8 +68,10 @@ typedef enum {
  * An element is a typed value.
  */
 typedef struct JST_Element_ {
-   JST_ValueType type;  //<! Element type
-   JST_Value     value; //<! Element value
+   JST_ValueType type;           //!< Element type
+   JST_Value     value;          //!< Element value
+   bool          parent_is_pair; //!< Used to cast parent field
+   void *        parent;         //!< Parent of this value,  of type JST_Pair or JST_ArrayItem, may be null when it's the root.
 } JST_Element;
 
 /**
@@ -81,8 +83,8 @@ extern const JST_Element JST_Element_Zero;
  * An array item has a parent and a typed value.
  */
 typedef struct JST_ArrayItem_ {
-   JST_Array * parent;  //<! The parent, an array
-   JST_Element element; //<! The data, an element of any type
+   JST_Array * parent;  //!< The parent, an array
+   JST_Element element; //!< The data, an element of any type
 } JST_ArrayItem;
 
 /**
@@ -109,7 +111,7 @@ extern const JST_Pair JST_Pair_Zero;
  * When things goes wrong, an error information is given.
  */
 typedef enum {
-   JST_ERR_NONE,                                /*!< All correct */
+   JST_ERR_NONE,                                //!< All correct
    JST_ERR_NULL_ARGUMENT,                       //!< Function misused
    JST_ERR_NULL_TYPE,                           //!< A type field has been set to JST_NONE
    JST_ERR_ERRNO,                               //!< strerror() or perror() can be used to show the operating system layer error
@@ -187,6 +189,24 @@ JST_Error JST_save_to_stream( FILE * stream, const JST_Element * root, unsigned 
 JST_Error JST_save_to_file( const char * filepath, const JST_Element * root, unsigned indent );
 
 /**
+ * Save the JSON tree to an XML stream, pretty-printed.
+ * @param stream the target stream.
+ * @param root the root of the tree to save.
+ * @param indent the amout of space to pretty print the tree.
+ * @return JST_ERR_NONE on success, JST_ERR_NULL_ARGUMENT, JST_ERR_ERRNO or JST_ERR_NULL_TYPE otherwise.
+ */
+JST_Error JST_save_to_xml_stream( FILE * stream, const JST_Element * root, unsigned indent );
+
+/**
+ * Save the JSON tree to an XML file, pretty-printed.
+ * @param filepath the path of the target file
+ * @param root     the root of the tree to save
+ * @param indent   the amout of space to pretty print the tree.
+ * @return JST_ERR_NONE on success, JST_ERR_NULL_ARGUMENT, JST_ERR_ERRNO or JST_ERR_NULL_TYPE otherwise.
+ */
+JST_Error JST_save_to_xml_file( const char * filepath, const JST_Element * root, unsigned indent );
+
+/**
  * Save the JSON tree to a stream, as a single line of text, without whitespaces.
  * @param stream the path of the target file
  * @param root   the root of the tree to save
@@ -206,17 +226,24 @@ JST_Error JST_save_to_file_compact( const char * filepath, const JST_Element * r
  * Serialize the JSON tree to a string, pretty-printed.
  * @param root   the root of the tree to save
  * @param dest   a pointer to the char buffer allocated by this function, must be freed by the user
- * @param indent the amout of space to pretty print the tree. When indent is
- *               negative, it means the JSON tree is printed with all the nodes on a single line.
+ * @param indent the amout of space to pretty print the tree.
  * @return JST_ERR_NONE on success, JST_ERR_NULL_ARGUMENT, JST_ERR_ERRNO or JST_ERR_NULL_TYPE otherwise.
  */
 JST_Error JST_serialize( JST_Element * root, char ** dest, unsigned indent );
 
 /**
+ * Serialize the JSON tree to an XML string, pretty-printed.
+ * @param root   the root of the tree to save
+ * @param dest   a pointer to the char buffer allocated by this function, must be freed by the user
+ * @param indent the amout of space to pretty print the tree.
+ * @return JST_ERR_NONE on success, JST_ERR_NULL_ARGUMENT, JST_ERR_ERRNO or JST_ERR_NULL_TYPE otherwise.
+ */
+JST_Error JST_serialize_xml( JST_Element * root, char ** dest, unsigned indent );
+
+/**
  * Serialize the JSON tree to a string as a single line of text, without whitespaces.
  * @param root the root of the tree to save
  * @param dest a pointer to the char buffer allocated by this function, must be freed by the user
- *             negative, it means the JSON tree is printed with all the nodes on a single line.
  * @return JST_ERR_NONE on success, JST_ERR_NULL_ARGUMENT, JST_ERR_ERRNO or JST_ERR_NULL_TYPE otherwise.
  */
 JST_Error JST_serialize_compact( JST_Element * root, char ** dest );

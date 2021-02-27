@@ -17,7 +17,7 @@ bool JST_DEBUG_SHOW_TOKENS = false;
 const JST_Array       JST_Array_Zero       = { .items = NULL, .count = 0U, .parent = NULL };
 const JST_Object      JST_Object_Zero      = { .items = NULL, .count = 0U, .parent = NULL, .first = NULL };
 const JST_Value       JST_Value_Zero       = { .object = JST_Object_Zero };
-const JST_Element     JST_Element_Zero     = { .type = JST_NULL, .value = JST_Value_Zero };
+const JST_Element     JST_Element_Zero     = { .type = JST_NULL, .value = JST_Value_Zero, .parent_is_pair = false, .parent = NULL };
 const JST_ArrayItem   JST_ArrayItem_Zero   = { .parent = NULL, .element = JST_Element_Zero };
 const JST_Pair        JST_Pair_Zero        = { .parent = NULL, .element = JST_Element_Zero, .name = NULL, .next = NULL };
 const JST_SyntaxError JST_SyntaxError_Zero = { .line = 0U, .pos = 0U };
@@ -352,17 +352,22 @@ static bool get_next_token( Context * context, Token * token ) {
 static bool add_object( Context * context, JST_Object * object, JST_Element * parent );
 static bool add_array( Context * context, JST_Array * array, JST_Element * parent );
 
-static bool set_value( Context * context, JST_Element * node, JST_Element * parent, const Token * token ) {
+static bool set_value( Context * context, JST_Element * node, JST_Pair * pparent, JST_ArrayItem * aparent, const Token * token ) {
+   if( pparent ) {
+      node->parent_is_pair = true;
+      node->parent = pparent;
+   }
+   else {
+      node->parent_is_pair = false;
+      node->parent = aparent;
+   }
    switch( token->type ) {
    case TOKEN_OPEN_OBJECT:
       node->type          = JST_OBJECT;
-      return add_object( context, &(node->value.object), parent );
-   case TOKEN_OPEN_ARRAY :
+      return add_object( context, &(node->value.object), node );
+   case TOKEN_OPEN_ARRAY:
       node->type          = JST_ARRAY;
-      return add_array( context, &(node->value.array), parent );
-   case TOKEN_NULL       :
-      node->type          = JST_NULL;
-      break;
+      return add_array( context, &(node->value.array), node );
    case TOKEN_TRUE:
       node->type          = JST_BOOLEAN;
       node->value.boolean = true;
@@ -383,6 +388,9 @@ static bool set_value( Context * context, JST_Element * node, JST_Element * pare
       node->type          = JST_STRING;
       node->value.string  = token->value.s;
       break;
+   case TOKEN_NULL:
+      node->type          = JST_NULL;
+      break;
    default:
       context->error = JST_ERR_UNEXPECTED_TOKEN;
       return false;
@@ -401,7 +409,9 @@ static JST_Pair * add_property( Context * context, char * property_name, JST_Obj
    Token token;
    if( get_next_token( context, &token )) {
       if( token.type == TOKEN_COLON ) {
-         if( get_next_token( context, &token ) && set_value( context, &(item->element), (JST_Element *)item, &token )) {
+         if(   get_next_token( context, &token )
+            && set_value( context, &(item->element), item, NULL, &token ))
+         {
             return item;
          }
       }
@@ -421,7 +431,7 @@ static JST_ArrayItem * add_item( Context * context, const Token * token, JST_Arr
       return NULL;
    }
    item->parent = parent;
-   if( set_value( context, &(item->element), (JST_Element *)item, token )) {
+   if( set_value( context, &(item->element), NULL, item, token )) {
       return item;
    }
    free( item );
@@ -544,7 +554,7 @@ JST_Error JST_load_from_stream( FILE * stream, JST_Element * root, JST_SyntaxErr
    context.stream = stream;
    bool    ok      = true
       && get_next_token( &context, &token )
-      && set_value( &context, root, NULL, &token )
+      && set_value( &context, root, NULL, NULL, &token )
       && remaining_chars_are_only_whitespaces( &context );
    if( ! ok ) {
       if( syntax_error ) {
