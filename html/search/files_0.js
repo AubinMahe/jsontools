@@ -8,6 +8,7 @@ var searchData=
   ['jst_5fpairs_5fcompare_2ec',['JST_pairs_compare.c',['../_j_s_t__pairs__compare_8c.html',1,'']]],
   ['jst_5fpairs_5fcompare_2eh',['JST_pairs_compare.h',['../_j_s_t__pairs__compare_8h.html',1,'']]],
   ['jst_5fsave_2ec',['JST_save.c',['../_j_s_t__save_8c.html',1,'']]],
+  ['jst_5fsave_5fxml_2ec',['JST_save_xml.c',['../_j_s_t__save__xml_8c.html',1,'']]],
   ['jst_5fserialize_2ec',['JST_serialize.c',['../_j_s_t__serialize_8c.html',1,'']]],
   ['jst_5fstring_2ec',['JST_string.c',['../_j_s_t__string_8c.html',1,'']]],
   ['jst_5fstring_2eh',['JST_string.h',['../_j_s_t__string_8h.html',1,'']]],

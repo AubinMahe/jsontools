@@ -1,7 +1,7 @@
 <map id="JST_Value" name="JST_Value">
-<area shape="rect" id="node3" href="$struct_j_s_t___element__.html" title="An element is a typed value. " alt="" coords="151,189,259,267"/>
-<area shape="rect" id="node2" href="$struct_j_s_t___array.html" title="A JSON array. " alt="" coords="6,329,90,407"/>
-<area shape="rect" id="node4" href="$struct_j_s_t___array_item__.html" title="An array item has a parent and a typed value. " alt="" coords="25,484,143,561"/>
-<area shape="rect" id="node5" href="$struct_j_s_t___object.html" title="A JSON object, a sorted set of named&#45;value pairs. " alt="" coords="339,329,429,407"/>
-<area shape="rect" id="node6" href="$struct_j_s_t___pair__.html" title="A object attribute item has a parent and is a named&#45;typed&#45;value pair. " alt="" coords="263,484,345,561"/>
+<area shape="rect" id="node3" href="$struct_j_s_t___element__.html" title="An element is a typed value. " alt="" coords="149,189,264,296"/>
+<area shape="rect" id="node2" href="$struct_j_s_t___array.html" title="A JSON array. " alt="" coords="6,359,90,436"/>
+<area shape="rect" id="node4" href="$struct_j_s_t___array_item__.html" title="An array item has a parent and a typed value. " alt="" coords="25,513,143,591"/>
+<area shape="rect" id="node5" href="$struct_j_s_t___object.html" title="A JSON object, a sorted set of named&#45;value pairs. " alt="" coords="339,359,429,436"/>
+<area shape="rect" id="node6" href="$struct_j_s_t___pair__.html" title="A object attribute item has a parent and is a named&#45;typed&#45;value pair. " alt="" coords="263,513,345,591"/>
 </map>

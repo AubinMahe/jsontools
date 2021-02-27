@@ -2,13 +2,14 @@
 <area shape="rect" id="node2" href="$_j_s_t__delete_8c.html" title="src/JST_delete.c" alt="" coords="5,80,127,107"/>
 <area shape="rect" id="node3" href="$_j_s_t__get_8c.html" title="src/JST_get.c" alt="" coords="151,80,255,107"/>
 <area shape="rect" id="node4" href="$_j_s_t__list_8h.html" title="src/JST_list.h" alt="" coords="280,80,383,107"/>
-<area shape="rect" id="node6" href="$_j_s_t__load_8c.html" title="src/JST_load.c" alt="" coords="340,155,451,181"/>
-<area shape="rect" id="node7" href="$_j_s_t__string_8h.html" title="src/JST_string.h" alt="" coords="459,80,577,107"/>
-<area shape="rect" id="node10" href="$_j_s_t__pairs__compare_8c.html" title="src/JST_pairs_compare.c" alt="" coords="602,80,773,107"/>
-<area shape="rect" id="node11" href="$_j_s_t__save_8c.html" title="src/JST_save.c" alt="" coords="797,80,911,107"/>
-<area shape="rect" id="node12" href="$_j_s_t__update_8c.html" title="src/JST_update.c" alt="" coords="935,80,1061,107"/>
-<area shape="rect" id="node13" href="$_j_s_t__walk_8c.html" title="src/JST_walk.c" alt="" coords="1085,80,1199,107"/>
-<area shape="rect" id="node5" href="$_j_s_t__list_8c.html" title="src/JST_list.c" alt="" coords="213,155,316,181"/>
-<area shape="rect" id="node8" href="$_j_s_t__serialize_8c.html" title="src/JST_serialize.c" alt="" coords="475,155,609,181"/>
-<area shape="rect" id="node9" href="$_j_s_t__string_8c.html" title="src/JST_string.c" alt="" coords="633,155,752,181"/>
+<area shape="rect" id="node6" href="$_j_s_t__load_8c.html" title="src/JST_load.c" alt="" coords="319,155,429,181"/>
+<area shape="rect" id="node7" href="$_j_s_t__string_8h.html" title="src/JST_string.h" alt="" coords="509,80,628,107"/>
+<area shape="rect" id="node8" href="$_j_s_t__save__xml_8c.html" title="src/JST_save_xml.c" alt="" coords="453,155,596,181"/>
+<area shape="rect" id="node11" href="$_j_s_t__pairs__compare_8c.html" title="src/JST_pairs_compare.c" alt="" coords="653,80,823,107"/>
+<area shape="rect" id="node12" href="$_j_s_t__save_8c.html" title="src/JST_save.c" alt="" coords="847,80,962,107"/>
+<area shape="rect" id="node13" href="$_j_s_t__update_8c.html" title="src/JST_update.c" alt="" coords="986,80,1111,107"/>
+<area shape="rect" id="node14" href="$_j_s_t__walk_8c.html" title="src/JST_walk.c" alt="" coords="1136,80,1249,107"/>
+<area shape="rect" id="node5" href="$_j_s_t__list_8c.html" title="src/JST_list.c" alt="" coords="192,155,295,181"/>
+<area shape="rect" id="node9" href="$_j_s_t__serialize_8c.html" title="src/JST_serialize.c" alt="" coords="763,155,897,181"/>
+<area shape="rect" id="node10" href="$_j_s_t__string_8c.html" title="src/JST_string.c" alt="" coords="620,155,739,181"/>
 </map>

@@ -8,6 +8,7 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     [ "JST_pairs_compare.c", "_j_s_t__pairs__compare_8c.html", "_j_s_t__pairs__compare_8c" ],
     [ "JST_pairs_compare.h", "_j_s_t__pairs__compare_8h.html", "_j_s_t__pairs__compare_8h" ],
     [ "JST_save.c", "_j_s_t__save_8c.html", "_j_s_t__save_8c" ],
+    [ "JST_save_xml.c", "_j_s_t__save__xml_8c.html", "_j_s_t__save__xml_8c" ],
     [ "JST_serialize.c", "_j_s_t__serialize_8c.html", "_j_s_t__serialize_8c" ],
     [ "JST_string.c", "_j_s_t__string_8c.html", "_j_s_t__string_8c" ],
     [ "JST_string.h", "_j_s_t__string_8h.html", "_j_s_t__string_8h" ],
