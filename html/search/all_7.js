@@ -78,7 +78,7 @@ var searchData=
   ['jst_5fserialize',['JST_serialize',['../jstools_8h.html#ad0585284074825450960f50193e26897',1,'JST_serialize(JST_Element *root, char **dest, unsigned indent):&#160;JST_serialize.c'],['../_j_s_t__serialize_8c.html#ad0585284074825450960f50193e26897',1,'JST_serialize(JST_Element *root, char **dest, unsigned indent):&#160;JST_serialize.c']]],
   ['jst_5fserialize_2ec',['JST_serialize.c',['../_j_s_t__serialize_8c.html',1,'']]],
   ['jst_5fserialize_5fcompact',['JST_serialize_compact',['../jstools_8h.html#a3e06d4d6b574591fdf117587389aad4a',1,'JST_serialize_compact(JST_Element *root, char **dest):&#160;JST_serialize.c'],['../_j_s_t__serialize_8c.html#a3e06d4d6b574591fdf117587389aad4a',1,'JST_serialize_compact(JST_Element *root, char **dest):&#160;JST_serialize.c']]],
-  ['jst_5fserialize_5fxml',['JST_serialize_xml',['../jstools_8h.html#abcfc06d1999e2378dcce75b45f519abe',1,'jstools.h']]],
+  ['jst_5fserialize_5fxml',['JST_serialize_xml',['../jstools_8h.html#abcfc06d1999e2378dcce75b45f519abe',1,'JST_serialize_xml(JST_Element *root, char **dest, unsigned indent):&#160;JST_save_xml.c'],['../_j_s_t__save__xml_8c.html#abcfc06d1999e2378dcce75b45f519abe',1,'JST_serialize_xml(JST_Element *root, char **dest, unsigned indent):&#160;JST_save_xml.c']]],
   ['jst_5fstring',['JST_String',['../struct_j_s_t___string.html',1,'JST_String'],['../jstools_8h.html#a9bf09b339d0cffb0e3ed5f71482e0fd4a2d30a3a2fa0b059c0bac169b8d3605f6',1,'JST_STRING():&#160;jstools.h']]],
   ['jst_5fstring_2ec',['JST_string.c',['../_j_s_t__string_8c.html',1,'']]],
   ['jst_5fstring_2eh',['JST_string.h',['../_j_s_t__string_8h.html',1,'']]],
