@@ -155,14 +155,127 @@ static bool test_remove_property( JST_Element * root ) {
       && check_sequence_of_pairs( elt, names, names_count );
 }
 
-static bool test_save( const char * ref, JST_Element * root ) {
+static bool test_parents( JST_Element * root ) {
+   JST_Element * elt = NULL;
+   if( JST_get( "repository.examples[2].subs[0].value", root, &elt ) != JST_ERR_NONE ) {
+      return false;
+   }
+   if( elt->type != JST_INTEGER ) {
+      return false;
+   }
+   if( elt->parent == NULL ) {
+      return false;
+   }
+   if( ! elt->parent_is_pair ) {
+      return false;
+   }
+   JST_Pair * pair = (JST_Pair *)(elt->parent);
+   if( pair == NULL ) {
+      return false;
+   }
+   if( strcmp( pair->name, "value" )) {
+      return false;
+   }
+   JST_Object * object = pair->parent;
+   if( object == NULL ) {
+      return false;
+   }
+   elt = object->parent;
+   if( elt == NULL ) {
+      return false;
+   }
+   if( elt->parent_is_pair ) {
+      return false;
+   }
+   const JST_ArrayItem * item = (const JST_ArrayItem *)elt->parent;
+   if( item == NULL ) {
+      return false;
+   }
+   const JST_Array * array = item->parent;
+   if( array->items[0] != item ) {
+      return false;
+   }
+   elt = array->parent;
+   if( elt == NULL ) {
+      return false;
+   }
+   if( ! elt->parent_is_pair ) {
+      return false;
+   }
+   pair = (JST_Pair *)(elt->parent);
+   if( pair == NULL ) {
+      return false;
+   }
+   if( strcmp( pair->name, "subs" )) {
+      return false;
+   }
+   object = pair->parent;
+   if( object == NULL ) {
+      return false;
+   }
+   elt = object->parent;
+   if( elt == NULL ) {
+      return false;
+   }
+   if( elt->parent_is_pair ) {
+      return false;
+   }
+   item = (const JST_ArrayItem *)elt->parent;
+   if( item == NULL ) {
+      return false;
+   }
+   array = item->parent;
+   if( array->items[2] != item ) {
+      return false;
+   }
+   elt = array->parent;
+   if( elt == NULL ) {
+      return false;
+   }
+   if( ! elt->parent_is_pair ) {
+      return false;
+   }
+   pair = (JST_Pair *)(elt->parent);
+   if( pair == NULL ) {
+      return false;
+   }
+   if( strcmp( pair->name, "examples" )) {
+      return false;
+   }
+   object = pair->parent;
+   if( object == NULL ) {
+      return false;
+   }
+   elt = object->parent;
+   if( elt == NULL ) {
+      return false;
+   }
+   if( ! elt->parent_is_pair ) {
+      return false;
+   }
+   pair = (JST_Pair *)(elt->parent);
+   if( pair == NULL ) {
+      return false;
+   }
+   if( strcmp( pair->name, "repository" )) {
+      return false;
+   }
+   object = pair->parent;
+   if( object == NULL ) {
+      return false;
+   }
+   elt = object->parent;
+   return elt == root;
+}
+
+static bool test_save( JST_Element * root, const char * ref ) {
    char cmp_command[240];
    snprintf( cmp_command, sizeof( cmp_command ), "cmp %s /tmp/pass4-save.json", ref );
    return( JST_save_to_file( "/tmp/pass4-save.json", root, 2 ) == JST_ERR_NONE )
       && ( system( cmp_command ) == EXIT_SUCCESS );
 }
 
-static bool test_serialize( const char * ref, JST_Element * root ) {
+static bool test_serialize( JST_Element * root, const char * ref ) {
    char cmp_command[240];
    snprintf( cmp_command, sizeof( cmp_command ), "cmp %s /tmp/pass4-serialize.json", ref );
    char * buffer = NULL;
@@ -176,14 +289,14 @@ static bool test_serialize( const char * ref, JST_Element * root ) {
    return system( cmp_command ) == EXIT_SUCCESS;
 }
 
-static bool test_save_compact( const char * ref, JST_Element * root ) {
+static bool test_save_compact( JST_Element * root, const char * ref ) {
    char cmp_command[240];
    snprintf( cmp_command, sizeof( cmp_command ), "cmp %s /tmp/pass5-save-compact.json", ref );
    return( JST_save_to_file_compact( "/tmp/pass5-save-compact.json", root ) == JST_ERR_NONE )
       && ( system( cmp_command ) == EXIT_SUCCESS );
 }
 
-static bool test_serialize_compact( const char * ref, JST_Element * root ) {
+static bool test_serialize_compact( JST_Element * root, const char * ref ) {
    char cmp_command[240];
    snprintf( cmp_command, sizeof( cmp_command ), "cmp %s /tmp/pass5-serialize-compact.json", ref );
    char * buffer = NULL;
@@ -197,7 +310,7 @@ static bool test_serialize_compact( const char * ref, JST_Element * root ) {
    return system( cmp_command ) == EXIT_SUCCESS;
 }
 
-static bool test_save_xml( const char * json_filename, JST_Element * root ) {
+static bool test_save_xml( JST_Element * root, const char * json_filename ) {
    char * xml_filename = strdup( json_filename );
    if( strtok( xml_filename, "." ) == NULL ) {
       free( xml_filename );
@@ -210,6 +323,31 @@ static bool test_save_xml( const char * json_filename, JST_Element * root ) {
       &&     ( system( cmp_command ) == EXIT_SUCCESS );
    free( xml_filename );
    return ok;
+}
+
+static bool test_json_to_xml_text( JST_Element * root, const char * json_filename ) {
+   char * xml = NULL;
+   if( JST_serialize_xml( root, &xml, 3 ) != JST_ERR_NONE ) {
+      return false;
+   }
+   FILE * tmp = fopen( "/tmp/test_json_to_xml_text.xml", "wt" );
+   fputs( xml, tmp );
+   fclose ( tmp );
+   free( xml );
+   char * xml_filename = strdup( json_filename );
+   if( strtok( xml_filename, "." ) == NULL ) {
+      free( xml_filename );
+      return false;
+   }
+   strcat( xml_filename, ".xml" );
+   const char * fmt = "cmp %s /tmp/test_json_to_xml_text.xml";
+   size_t len = strlen( fmt ) + strlen( xml_filename );
+   char * cmp_command = malloc( len + 1 );
+   snprintf( cmp_command, len, fmt, xml_filename );
+   free( xml_filename );
+   int retVal = system( cmp_command );
+   free( cmp_command );
+   return retVal == EXIT_SUCCESS;
 }
 
 static const char * get_error_string( JST_Error err ) {
@@ -248,25 +386,27 @@ int main( int argc, char * argv[] ) {
          }
          else {
             if( strstr( json_filename, "data/object.json" )) {
-               if(   test_get            ( &root )
-                  && test_add_property   ( &root )
-                  && test_add_item       ( &root )
-                  && test_replace_item   ( &root )
-                  && test_remove_item    ( &root )
-                  && test_remove_property( &root )
-                  && test_save_xml       ( json_filename, &root ))
+               if(   test_get             ( &root )
+                  && test_add_property    ( &root )
+                  && test_add_item        ( &root )
+                  && test_replace_item    ( &root )
+                  && test_remove_item     ( &root )
+                  && test_remove_property ( &root )
+                  && test_parents         ( &root )
+                  && test_save_xml        ( &root, json_filename )
+                  && test_json_to_xml_text( &root, json_filename ))
                {
                   retVal = EXIT_SUCCESS;
                }
             }
             else if( strstr( json_filename, "data/pass4.json" )) {
-               bool ok = test_save             ( json_filename, &root )
-                  &&     test_serialize        ( json_filename, &root );
+               bool ok = test_save             ( &root, json_filename )
+                  &&     test_serialize        ( &root, json_filename );
                retVal = ok ? EXIT_SUCCESS : EXIT_FAILURE;
             }
             else if( strstr( json_filename, "data/pass5.json" )) {
-               bool ok = test_save_compact     ( json_filename, &root )
-                  &&     test_serialize_compact( json_filename, &root );
+               bool ok = test_save_compact     ( &root, json_filename )
+                  &&     test_serialize_compact( &root, json_filename );
                retVal = ok ? EXIT_SUCCESS : EXIT_FAILURE;
             }
             else {

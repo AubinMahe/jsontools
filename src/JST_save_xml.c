@@ -2,6 +2,7 @@
 #include "JST_string.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static const char * SCHEMA =
@@ -102,4 +103,130 @@ JST_Error JST_save_to_xml_file( const char * path, const JST_Element * root, uns
       return JST_ERR_ERRNO;
    }
    return JST_save_to_xml_stream( stream, root, indent );
+}
+
+static JST_Error serialize_element_xml( const JST_Element * elt, JST_String * string, unsigned left_margin, unsigned indent );
+
+static JST_Error serialize_object_xml( const JST_Object * object, JST_String * string, unsigned left_margin, unsigned indent ) {
+   for( JST_Pair * iter = object->first; iter; iter = iter->next ) {
+      if(  ( ! JST_String_spaces( string, left_margin ))
+         ||( ! JST_String_append_string( string, "<property name=\"" ))
+         ||( ! JST_String_append_string( string, iter->name ))
+         ||( ! JST_String_append_string( string, "\">\n" )))
+      {
+         return JST_ERR_ERRNO;
+      }
+      JST_Error err = serialize_element_xml( &(iter->element), string, left_margin+indent, indent );
+      if( err != JST_ERR_NONE ) {
+         return err;
+      }
+      if(  ( ! JST_String_spaces( string, left_margin ))
+         ||( ! JST_String_append_string( string, "</property>\n" )))
+      {
+         return JST_ERR_ERRNO;
+      }
+   }
+   return JST_ERR_NONE;
+}
+
+static JST_Error serialize_array_xml( const JST_Array * array, JST_String * string, unsigned left_margin, unsigned indent ) {
+   for( unsigned i = 0; i < array->count; ++i ) {
+      JST_Error err = serialize_element_xml( &(array->items[i]->element), string, left_margin, indent );
+      if( err != JST_ERR_NONE ) {
+         return err;
+      }
+   }
+   return JST_ERR_NONE;
+}
+
+static JST_Error serialize_element_xml( const JST_Element * elt, JST_String * string, unsigned left_margin, unsigned indent ) {
+   JST_String_spaces( string, left_margin );
+   char buffer[80];
+   switch( elt->type ) {
+   case JST_OBJECT:
+      JST_String_append_string( string, "<object" );
+      if( elt->parent == NULL ) {
+         JST_String_append_string( string, SCHEMA );
+      }
+      JST_String_append_string( string, ">\n" );
+      serialize_object_xml( &(elt->value.object), string, left_margin+indent, indent );
+      JST_String_spaces( string, left_margin );
+      JST_String_append_string( string, "</object>" );
+      break;
+   case JST_ARRAY:
+      JST_String_append_string( string, "<array" );
+      if( elt->parent == NULL ) {
+         JST_String_append_string( string, SCHEMA );
+      }
+      JST_String_append_string( string, ">\n" );
+      serialize_array_xml( &(elt->value.array ), string, left_margin+indent, indent );
+      JST_String_spaces( string, left_margin );
+      JST_String_append_string( string, "</array>" );
+      break;
+   case JST_BOOLEAN:
+      JST_String_append_string( string, "<boolean" );
+      if( elt->parent == NULL ) {
+         JST_String_append_string( string, SCHEMA );
+      }
+      JST_String_append_string( string, " value=\"" );
+      JST_String_append_string( string, elt->value.boolean ? "true" : "false" );
+      JST_String_append_string( string, "\" />" );
+      break;
+   case JST_INTEGER:
+      JST_String_append_string( string, "<integer" );
+      if( elt->parent == NULL ) {
+         JST_String_append_string( string, SCHEMA );
+      }
+      sprintf( buffer, " value=\"%ld\" />", elt->value.integer );
+      JST_String_append_string( string, buffer );
+      break;
+   case JST_DOUBLE:
+      JST_String_append_string( string, "<double" );
+      if( elt->parent == NULL ) {
+         JST_String_append_string( string, SCHEMA );
+      }
+      sprintf( buffer, " value=\"%G\" />", elt->value.dbl );
+      JST_String_append_string( string, buffer );
+      break;
+   case JST_STRING:
+      JST_String_append_string( string, "<string" );
+      if( elt->parent == NULL ) {
+         JST_String_append_string( string, SCHEMA );
+      }
+      JST_String_append_char( string, '>' );
+      JST_String_append_string( string, xml_encode( elt->value.string ));
+      JST_String_append_string( string, "</string>" );
+      break;
+   case JST_NULL:
+      JST_String_append_string( string, "<null" );
+      if( elt->parent == NULL ) {
+         JST_String_append_string( string, SCHEMA );
+      }
+      JST_String_append_string( string, " />" );
+      break;
+   default: return JST_ERR_NULL_TYPE;
+   }
+   JST_String_append_char( string, '\n' );
+   return JST_ERR_NONE;
+}
+
+JST_Error JST_serialize_xml( JST_Element * root, char ** dest, unsigned indent ) {
+   if(( root == NULL )||( dest == NULL )) {
+      return JST_ERR_NULL_ARGUMENT;
+   }
+   JST_String string = JST_String_Zero;
+   JST_String_append_string( &string, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" );
+   if(( serialize_element_xml( root, &string, 0, indent ) == JST_ERR_NONE )) {
+      *dest = realloc( string.buffer, string.length + 1 ); // truncate, if necessary
+      (*dest)[string.length] = '\0';
+      if( *dest == NULL ) {
+         JST_String_delete( &string );
+         JST_String_delete( &xml );
+         return JST_ERR_ERRNO;
+      }
+      string.buffer = NULL;
+   }
+   JST_String_delete( &string );
+   JST_String_delete( &xml );
+   return JST_ERR_NONE;
 }
