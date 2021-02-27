@@ -1,37 +1,65 @@
-## Welcome to GitHub Pages
+# JSON parser in C #
 
-You can use the [editor on GitHub](https://github.com/AubinMahe/jsontools/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+## Features ##
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+* Tree oriented: each node is strongly typed
+* Dynamically allocated: like a DOM XML parser, this parser reads all the data in memory,
+  chunks allocated by `calloc` and `strdup`.
+* Reading a file or a character buffer
+* Getting a JST_Element by its path
+* Creates, read, updates or deletes a property of an object or an item of an array.
+* Documentation built with [Doxygen](https://www.doxygen.nl/index.html)
 
-### Markdown
+## How to build ##
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+* download [jsontools-1.0.0.tar.gz](https://github.com/AubinMahe/jsontools/jsontools-1.0.0.tar.gz)
+* tar xzf jsontools-1.0.0.tar.gz
+* cd jsontools-1.0.0
+* ./configure
+* make
+* make install
 
-```markdown
-Syntax highlighted code block
+## API ##
 
-# Header 1
-## Header 2
-### Header 3
+See [documentation](https://aubinmahe.github.io/jsontools/html/index.html)
 
-- Bulleted
-- List
+## Sample code ##
 
-1. Numbered
-2. List
+This sample code:
+* read the json file ["data/object.json"](https://github.com/AubinMahe/jsontools/data/object.json)
+* search an element in the loaded tree via the path `"repository.examples[2].subs[3].value"`
+* print the value found
+* serialize as text the tree and print it
+* free the allocated resources
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
 ```
+#include "jstools.h"
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+#include <stdio.h>
+#include <stdlib.h>
 
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/AubinMahe/jsontools/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+int main( void ) {
+   const char *    json_filename = "data/object.json";
+   JST_Element     root          = JST_Element_Zero;
+   JST_SyntaxError syntax_error  = JST_SyntaxError_Zero;
+   JST_Error       err           = JST_load_from_file( json_filename, &root, &syntax_error );
+   if( err != JST_ERR_NONE ) {
+      return err;
+   }
+   const char *  json_path = "repository.examples[2].subs[3].value";
+   JST_Element * elt       = NULL;
+   if(  ( JST_get( json_path, &root, &elt ) == JST_ERR_NONE )
+      &&( elt != NULL )
+      &&( elt->type == JST_INTEGER ))
+   {
+      printf( "%s = %ld\n", json_path, elt->value.integer );
+   }
+   char * json_text = NULL;
+   if( JST_serialize( &root, &json_text, 2 ) == JST_ERR_NONE ) {
+      printf( "%s\n", json_text );
+      free( json_text );
+   }
+   JST_delete_element( &root );
+   return 0;
+}
+```
