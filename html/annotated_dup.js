@@ -3,6 +3,8 @@ var annotated_dup =
     [ "JST_Array", "struct_j_s_t___array.html", "struct_j_s_t___array" ],
     [ "JST_ArrayItem_", "struct_j_s_t___array_item__.html", "struct_j_s_t___array_item__" ],
     [ "JST_Element_", "struct_j_s_t___element__.html", "struct_j_s_t___element__" ],
+    [ "JST_Event", "struct_j_s_t___event.html", "struct_j_s_t___event" ],
+    [ "JST_Iterator", "struct_j_s_t___iterator.html", "struct_j_s_t___iterator" ],
     [ "JST_Node_", "struct_j_s_t___node__.html", "struct_j_s_t___node__" ],
     [ "JST_Object", "struct_j_s_t___object.html", "struct_j_s_t___object" ],
     [ "JST_Pair_", "struct_j_s_t___pair__.html", "struct_j_s_t___pair__" ],
