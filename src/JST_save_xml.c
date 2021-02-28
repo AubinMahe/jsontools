@@ -44,6 +44,15 @@ static const char * xml_encode( const char * text ) {
       case '>' : JST_String_append_string( &xml, "&gt;"   ); break;
       case '"' : JST_String_append_string( &xml, "&quot;" ); break;
       case '\'': JST_String_append_string( &xml, "&apos;" ); break;
+      case '\\':
+         switch( text[i+1] ) {
+         case 'b': JST_String_append_string( &xml, "\b" ); ++i; break;
+         case 'n': JST_String_append_string( &xml, "\n" ); ++i; break;
+         case 'r': JST_String_append_string( &xml, "\r" ); ++i; break;
+         case 't': JST_String_append_string( &xml, "\t" ); ++i; break;
+         default : JST_String_append_string( &xml, "\\" ); break;
+         }
+         break;
       default  : JST_String_append_char( &xml, c );          break;
       }
    }

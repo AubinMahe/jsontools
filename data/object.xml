@@ -20,7 +20,7 @@
       </array>
    </property>
    <property name="name">
-      <string>jsmn</string>
+      <string>jsontools</string>
    </property>
    <property name="keywords">
       <string>json</string>
@@ -29,7 +29,11 @@
       <string>Aubin Mahé, © 2021 (UTF-8 test string)</string>
    </property>
    <property name="description">
-      <string>Minimalistic JSON parser/tokenizer in C. It can be easily integrated into resource-limited or embedded projects</string>
+      <string>Tree oriented: each node is strongly typed.
+Dynamically allocated: like a DOM XML parser, this parser reads all the data in memory, chunks allocated by calloc and strdup.
+Reading a file or a character buffer.
+Getting a JST_Element by its path.
+Creates, read, updates or deletes a property of an object or an item of an array.</string>
    </property>
    <property name="repository">
       <object>
@@ -37,7 +41,7 @@
             <string>git</string>
          </property>
          <property name="url">
-            <string>https://github.com/zserge/jsmn.git</string>
+            <string>https://github.com/AubinMahe/jsontools</string>
          </property>
          <property name="examples">
             <array>

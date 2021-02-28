@@ -21,6 +21,7 @@ const JST_Element     JST_Element_Zero     = { .type = JST_NULL, .value = JST_Va
 const JST_ArrayItem   JST_ArrayItem_Zero   = { .parent = NULL, .element = JST_Element_Zero };
 const JST_Pair        JST_Pair_Zero        = { .parent = NULL, .element = JST_Element_Zero, .name = NULL, .next = NULL };
 const JST_SyntaxError JST_SyntaxError_Zero = { .line = 0U, .pos = 0U };
+const JST_Event       JST_Event_Zero       = { .type = JST_EVT_NONE, .data = { .boolean = false }};
 
 typedef enum {
    TOKEN_NONE,
@@ -36,6 +37,7 @@ typedef enum {
    TOKEN_DOUBLE,
    TOKEN_STRING,
    TOKEN_NULL,
+   TOKEN_END_OF_FILE
 } TokenType;
 
 static const TokenType TokenType_Zero = TOKEN_NONE;
@@ -75,7 +77,12 @@ static const Context Context_Zero = {
    .error      = JST_ERR_NONE
 };
 
-static const char EndOfFile = 26;
+typedef struct {
+   Context context;
+   Token   token;
+} JST_IteratorPrivate;
+
+#define JST_END_OF_FILE 26
 
 static bool get_next_char( Context * context, char * c ) {
    if( context->look_ahead ) {
@@ -86,7 +93,7 @@ static bool get_next_char( Context * context, char * c ) {
    if( context->pos >= context->limit ) {
       context->limit = fread( context->buffer, 1, sizeof( context->buffer ), context->stream );
       if(( context->limit == 0 )&& feof( context->stream )) {
-         *c = EndOfFile;
+         *c = JST_END_OF_FILE;
          return true;
       }
       context->pos = 0;
@@ -116,7 +123,7 @@ static bool check_separator( Context * context, JST_Error error ) {
       ||( c == '\r' )||( c == '\n' )
       ||( c == ','  )||( c == ':'  )
       ||( c == '}'  )||( c == ']'  )
-      ||( c == '\0' )||( c == EndOfFile ))
+      ||( c == '\0' )||( c == JST_END_OF_FILE ))
    {
       context->look_ahead = c; // On remet ce qu'on a lu de trop
       return true;
@@ -137,7 +144,7 @@ static bool get_number( Context * context, char c, Token * token ) {
    JST_String_append_char( &s, c );
    while( get_next_char( context, &c )
       &&( ! is_separator_after_number( c ))
-      &&( c != EndOfFile )
+      &&( c != JST_END_OF_FILE )
       &&  JST_String_append_char( &s, c ));
    context->look_ahead = c; // On remet ce qu'on a lu de trop
    if(( s.length > 2 )&&( s.buffer[0] == '0' )&&( s.buffer[1] != '.' )) {
@@ -222,8 +229,7 @@ static bool get_string( Context * context, Token * token ) {
    if( c == '"' ) {
       if( s.buffer ) {
          s.buffer[s.length-1] = '\0';
-         token->value.s = strdup( s.buffer );
-         JST_String_delete( &s );
+         token->value.s = realloc( s.buffer, s.length );
          if( JST_DEBUG_SHOW_TOKENS ) {
             fprintf( stderr, "TOKEN_STRING: '%s'\n", token->value.s );
          }
@@ -342,6 +348,9 @@ static bool get_next_token( Context * context, Token * token ) {
    case '-': case '0':case '1':case '2':case '3':
    case '4': case '5':case '6':case '7':case '8':
    case '9': return get_number( context, c, token );
+   case JST_END_OF_FILE:
+      token->type  = TOKEN_END_OF_FILE;
+      break;
    default:
       context->error = JST_ERR_UNEXPECTED_TOKEN;
       return false;
@@ -556,26 +565,24 @@ JST_Error JST_load_from_stream( FILE * stream, JST_Element * root, JST_SyntaxErr
       && get_next_token( &context, &token )
       && set_value( &context, root, NULL, NULL, &token )
       && remaining_chars_are_only_whitespaces( &context );
-   if( ! ok ) {
-      if( syntax_error ) {
-         syntax_error->line = (unsigned)( 1 + context.line );
-         size_t pos = (( context.pos < context.limit )||(context.limit == 0 )) ? context.pos : ( context.limit - 1 );
-         while(( pos > 0 )
-            && (( context.pos - pos ) < ( sizeof( syntax_error->context ) / 2 ))
-            && ( context.buffer[pos] != '\r' )
-            && ( context.buffer[pos] != '\n' ))
-         {
-            --pos;
-         }
-         if(( context.buffer[pos] == '\r' )||( context.buffer[pos] == '\n' )) {
-            ++pos;
-         }
-         strncpy( syntax_error->context, context.buffer + pos, sizeof( syntax_error->context ) - 1 );
-         syntax_error->context[sizeof( syntax_error->context )-1] = '\0';
-         syntax_error->pos  = (unsigned)( context.pos - pos );
-         if( syntax_error->pos > 0 ) {
-            --(syntax_error->pos);
-         }
+   if(( ! ok )&& syntax_error ) {
+      syntax_error->line = (unsigned)( 1 + context.line );
+      size_t pos = (( context.pos < context.limit )||(context.limit == 0 )) ? context.pos : ( context.limit - 1 );
+      while(( pos > 0 )
+         && (( context.pos - pos ) < ( sizeof( syntax_error->context ) / 2 ))
+         && ( context.buffer[pos] != '\r' )
+         && ( context.buffer[pos] != '\n' ))
+      {
+         --pos;
+      }
+      if(( context.buffer[pos] == '\r' )||( context.buffer[pos] == '\n' )) {
+         ++pos;
+      }
+      strncpy( syntax_error->context, context.buffer + pos, sizeof( syntax_error->context ) - 1 );
+      syntax_error->context[sizeof( syntax_error->context )-1] = '\0';
+      syntax_error->pos  = (unsigned)( context.pos - pos );
+      if( syntax_error->pos > 0 ) {
+         --(syntax_error->pos);
       }
    }
    return context.error;
@@ -594,4 +601,109 @@ JST_Error JST_load_from_file( const char * path, JST_Element * root, JST_SyntaxE
    fclose( stream );
    errno = myerrno;
    return error;
+}
+
+JST_Error JST_open_iterator_from_stream( FILE * stream, JST_Iterator * iterator ) {
+   if(( stream == NULL )||( iterator == NULL )) {
+      return JST_ERR_NULL_ARGUMENT;
+   }
+   JST_IteratorPrivate * iter = calloc( 1, sizeof( JST_IteratorPrivate ));
+   if( iter == NULL ) {
+      return JST_ERR_ERRNO;
+   }
+   iter->token          = Token_Zero;
+   iter->context.stream = stream;
+   *iterator = (JST_Iterator)iter;
+   return get_next_token( &(iter->context), &(iter->token)) ? JST_ERR_NONE : iter->context.error;
+}
+
+JST_Error JST_open_iterator_from_file( const char * path, JST_Iterator * iterator ) {
+   if(( path == NULL )) {
+      return JST_ERR_NULL_ARGUMENT;
+   }
+   FILE * stream = fopen( path, "rt" );
+   if( stream == NULL ) {
+      return JST_ERR_ERRNO;
+   }
+   return JST_open_iterator_from_stream( stream, iterator );
+}
+
+bool JST_get_next( JST_Iterator iterator, JST_Event * event ) {
+   if(( iterator == NULL )||( event == NULL )) {
+      if( event ) {
+         event->error = JST_ERR_NULL_ARGUMENT;
+      }
+      return false;
+   }
+   JST_IteratorPrivate * iter = (JST_IteratorPrivate *)iterator;
+   event->error = JST_ERR_NONE;
+   if( iter->token.type == TOKEN_STRING ) {
+      free( iter->token.value.s );
+      iter->token.value.s = NULL;
+   }
+   for( unsigned  i = 0; i < 2; ++i ) {
+      if( get_next_token( &(iter->context), &(iter->token))) {
+         switch( iter->token.type ) {
+         case TOKEN_OPEN_OBJECT : event->type = JST_EVT_OPEN_OBJECT;  return true;
+         case TOKEN_CLOSE_OBJECT: event->type = JST_EVT_CLOSE_OBJECT; return true;
+         case TOKEN_OPEN_ARRAY  : event->type = JST_EVT_OPEN_ARRAY;   return true;
+         case TOKEN_CLOSE_ARRAY : event->type = JST_EVT_CLOSE_ARRAY;  return true;
+         case TOKEN_TRUE:
+            event->type = JST_EVT_VALUE_BOOLEAN;
+            event->data.boolean = true;
+            return true;
+         case TOKEN_FALSE:
+            event->type = JST_EVT_VALUE_BOOLEAN;
+            event->data.boolean = false;
+            return true;
+         case TOKEN_INTEGER:
+            event->type = JST_EVT_VALUE_INTEGER;
+            event->data.integer = iter->token.value.i;
+            return true;
+         case TOKEN_DOUBLE:
+            event->type = JST_EVT_VALUE_DOUBLE;
+            event->data.dbl     = iter->token.value.d;
+            return true;
+         case TOKEN_STRING:
+            event->type = JST_EVT_VALUE_STRING;
+            event->data.string  = iter->token.value.s;
+            return true;
+         case TOKEN_NULL:
+            event->type = JST_EVT_VALUE_NULL;
+            return true;
+
+         case TOKEN_END_OF_FILE:
+            return false;
+
+         case TOKEN_COMMA:
+         case TOKEN_COLON:
+            continue;
+
+         default:
+         case TOKEN_NONE:
+            event->error = JST_ERR_UNEXPECTED_TOKEN;
+            return false;
+         }
+      }
+      else {
+         event->error = iter->context.error;
+      }
+   }
+   return false;
+}
+
+JST_Error JST_close_iterator( JST_Iterator * iterator ) {
+   if(( iterator == NULL )||( *iterator == NULL )) {
+      return JST_ERR_NULL_ARGUMENT;
+   }
+   JST_IteratorPrivate * iter = *((JST_IteratorPrivate **)iterator);
+   if( iter->token.type == TOKEN_STRING ) {
+      free( iter->token.value.s );
+   }
+   if( iter->context.stream ) {
+      fclose( iter->context.stream );
+   }
+   free( iter );
+   *iterator = NULL;
+   return JST_ERR_NONE;
 }

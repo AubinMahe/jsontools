@@ -71,7 +71,7 @@ typedef struct JST_Element_ {
    JST_ValueType type;           //!< Element type
    JST_Value     value;          //!< Element value
    bool          parent_is_pair; //!< Used to cast parent field
-   void *        parent;         //!< Parent of this value,  of type JST_Pair or JST_ArrayItem, may be null when it's the root.
+   void *        parent;         //!< Parent of this value, of type JST_Pair or JST_ArrayItem, may be null when it's the root.
 } JST_Element;
 
 /**
@@ -117,7 +117,7 @@ typedef enum {
    JST_ERR_ERRNO,                               //!< strerror() or perror() can be used to show the operating system layer error
    JST_ERR_STRING_NOT_ENDED,                    //!< ending quote has not been found
    JST_ERR_STRING_BAD_ESCAPE_SEQUENCE,          //!< only ", \, /, b, f, n, r, t, u may be escaped
-   JST_ERR_STRING_CONTROL_CHAR_MUST_BE_ESCAPED, /*!< a control character has been found, it must be escaped */
+   JST_ERR_STRING_CONTROL_CHAR_MUST_BE_ESCAPED, //!< a control character has been found, it must be escaped
    JST_ERR_SEPARATOR_EXPECTED_AFTER_TRUE,       //!< syntax error on 'true'
    JST_ERR_SEPARATOR_EXPECTED_AFTER_FALSE,      //!< syntax error on 'false'
    JST_ERR_SEPARATOR_EXPECTED_AFTER_NULL,       //!< syntax error on 'null'
@@ -153,6 +153,47 @@ typedef struct {
 extern const JST_SyntaxError JST_SyntaxError_Zero;
 
 /**
+ * Abstract Data Type used for reading JSON files via events, like SAX.
+ */
+typedef struct { unsigned unused; } * JST_Iterator;
+
+/**
+ * Events pulled when reading JSON files with a SAX like API.
+ */
+typedef enum {
+   JST_EVT_NONE,          //!< No event at all
+   JST_EVT_OPEN_OBJECT,   //!< '{' character has been read
+   JST_EVT_CLOSE_OBJECT,  //!< '}' character has been read
+   JST_EVT_OPEN_ARRAY,    //!< '[' character has been read
+   JST_EVT_CLOSE_ARRAY,   //!< ']' character has been read
+   JST_EVT_FIELD_NAME,    //!< An object field name has been read
+   JST_EVT_VALUE_BOOLEAN, //!< A boolean value has been read
+   JST_EVT_VALUE_INTEGER, //!< An integer value has been read
+   JST_EVT_VALUE_DOUBLE,  //!< A double value has been read
+   JST_EVT_VALUE_STRING,  //!< A string value has been read
+   JST_EVT_VALUE_NULL     //!< A null value has been read
+} JST_EventType;
+
+/**
+ * Data filled when reading JSON files with a SAX like API.
+ */
+typedef struct {
+   JST_EventType type;     //!< type of data
+   union {
+      bool       boolean;  //!< boolean value
+      int64_t    integer;  //!< integer value
+      double     dbl;      //!< double value
+      char *     string;   //!< string value
+   }             data;     //!< value
+   JST_Error     error;    //!< error, when things goes wrong
+} JST_Event;
+
+/**
+ * Constant defined to initialize safely a variable of type JST_Event.
+ */
+extern const JST_Event JST_Event_Zero;
+
+/**
  * Reads the input file, allocates the node of the corresponding tree, than frees the input buffer.
  * @param filepath the file path
  * @param root the root of the JSON tree
@@ -169,6 +210,37 @@ JST_Error JST_load_from_file( const char * filepath, JST_Element * root, JST_Syn
  * @return JST_ERR_NONE on success, JST_ERR_NULL_ARGUMENT, JST_ERR_ERRNO or any syntax error otherwise.
  */
 JST_Error JST_load_from_stream( FILE * stream, JST_Element * root, JST_SyntaxError * error );
+
+/**
+ * Creates an iterator to read a file
+ * @param filepath the path of the JSON file
+ * @param iterator the address of the iterator (out parameter)
+ * @return JST_ERR_NONE on success, JST_ERR_NULL_ARGUMENT or JST_ERR_ERRNO otherwise.
+ */
+JST_Error JST_open_iterator_from_file( const char * filepath, JST_Iterator * iterator );
+
+/**
+ * Creates an iterator to read a stream
+ * @param stream the JSON stream to read
+ * @param iterator the address of the iterator (out parameter)
+ * @return JST_ERR_NONE on success, JST_ERR_NULL_ARGUMENT or JST_ERR_ERRNO otherwise.
+ */
+JST_Error JST_open_iterator_from_stream( FILE * stream, JST_Iterator * iterator );
+
+/**
+ * Fetch the next event from the stream (or file)
+ * @param iterator the iterator to use
+ * @param event    the event to fill (ou parameter)
+ * @return true when the iteration can continue, false when it's done.
+ */
+bool JST_get_next( JST_Iterator iterator, JST_Event * event );
+
+/**
+ * Free the resources used by the iterator
+ * @param iterator the iterator to delete
+ * @return JST_ERR_NONE on success, JST_ERR_NULL_ARGUMENT otherwise.
+ */
+JST_Error JST_close_iterator( JST_Iterator * iterator );
 
 /**
  * Save the JSON tree to a stream, pretty-printed.

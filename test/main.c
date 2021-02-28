@@ -350,6 +350,39 @@ static bool test_json_to_xml_text( JST_Element * root, const char * json_filenam
    return retVal == EXIT_SUCCESS;
 }
 
+static bool test_json_iterator( const char * json_filename ) {
+   JST_Iterator iterator = NULL;
+   if( JST_open_iterator_from_file( json_filename, &iterator ) == JST_ERR_NONE ) {
+      JST_Event event = JST_Event_Zero;
+      while( JST_get_next( iterator, &event )) {
+         switch( event.type ) {
+         case JST_EVT_OPEN_OBJECT  : printf( "Open object\n"  ); break;
+         case JST_EVT_CLOSE_OBJECT : printf( "Close object\n" ); break;
+         case JST_EVT_OPEN_ARRAY   : printf( "Open array\n"   ); break;
+         case JST_EVT_CLOSE_ARRAY  : printf( "Close array\n"  ); break;
+         case JST_EVT_FIELD_NAME   : printf( "(field name) \"%s\"\n", event.data.string ); break;
+         case JST_EVT_VALUE_BOOLEAN: printf( "(boolean) %s\n", event.data.boolean ? "true" : "false" ); break;
+         case JST_EVT_VALUE_INTEGER: printf( "(int64_t) %ld\n", event.data.integer ); break;
+         case JST_EVT_VALUE_DOUBLE : printf( "(double) %G\n", event.data.dbl ); break;
+         case JST_EVT_VALUE_STRING : printf( "(string) \"%s\"\n", event.data.string ); break;
+         case JST_EVT_VALUE_NULL   : printf( "(null)\n" ); break;
+         default:
+            printf( "???\n" );
+            JST_close_iterator( &iterator );
+            return false;
+         }
+      }
+      if( event.error == JST_ERR_NONE ) {
+         event.error = JST_close_iterator( &iterator );
+      }
+      else {
+         JST_close_iterator( &iterator );
+      }
+      return event.error == JST_ERR_NONE;
+   }
+   return false;
+}
+
 static const char * get_error_string( JST_Error err ) {
    switch( err ) {
    case JST_ERR_ERRNO                         : return strerror( errno );
@@ -415,6 +448,9 @@ int main( int argc, char * argv[] ) {
             }
          }
          JST_delete_element( &root );
+         if(( retVal == EXIT_SUCCESS )&& strstr( json_filename, "data/object.json" )) {
+            retVal = test_json_iterator( json_filename ) ? EXIT_SUCCESS : EXIT_FAILURE;
+         }
       }
    }
    return retVal;
